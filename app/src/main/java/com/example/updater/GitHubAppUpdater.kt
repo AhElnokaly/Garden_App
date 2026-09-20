@@ -58,7 +58,12 @@ class GitHubAppUpdater(
 
             val response = client.newCall(request).execute()
             if (!response.isSuccessful) {
-                val state = UpdateState.Error("فشل فحص التحديثات: رمز ${response.code}")
+                val errorMsg = when (response.code) {
+                    404 -> "لا يوجد إصدار جديد منشور حالياً على المستودع ($repoOwner/$repoName)"
+                    403 -> "تم تجاوز الحد المؤقت لطلبات GitHub، يرجى المحاولة لاحقاً"
+                    else -> "فشل فحص التحديثات: رمز ${response.code}"
+                }
+                val state = UpdateState.Error(errorMsg)
                 _updateState.value = state
                 return@withContext state
             }
