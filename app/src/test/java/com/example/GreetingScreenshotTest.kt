@@ -2,7 +2,7 @@ package com.example
 
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
-import com.example.ui.screens.CatalogPlantCard
+import com.example.ui.components.CatalogPlantCard
 import com.example.ui.theme.GardenCompanionTheme
 import com.example.data.InitialPlantData
 import com.github.takahirom.roborazzi.RobolectricDeviceQualifiers

@@ -3,6 +3,7 @@ package com.example.data.model
 data class UserPlantWithDetails(
     val userPlant: UserPlant,
     val plant: Plant,
+    val place: Place?,
     val lastWateredLog: CareLog?,
     val latestCareLog: CareLog?
 ) {
@@ -22,4 +23,7 @@ data class UserPlantWithDetails(
             val lastWaterTime = lastWateredLog?.timestamp ?: return -1
             return ((System.currentTimeMillis() - lastWaterTime) / (1000L * 60 * 60 * 24)).toInt()
         }
+
+    val placeName: String
+        get() = place?.name ?: "البلكونة"
 }

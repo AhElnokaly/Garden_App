@@ -13,15 +13,24 @@ import androidx.room.PrimaryKey
             parentColumns = ["id"],
             childColumns = ["plant_id"],
             onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = Place::class,
+            parentColumns = ["id"],
+            childColumns = ["place_id"],
+            onDelete = ForeignKey.RESTRICT
         )
     ],
-    indices = [Index("plant_id")]
+    indices = [
+        Index("plant_id"),
+        Index("place_id")
+    ]
 )
 data class UserPlant(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
     val plant_id: Int,
     val nickname: String,
-    val place: String = "البلكونة",
+    val place_id: Int = 1,
     val added_date: Long = System.currentTimeMillis()
 )

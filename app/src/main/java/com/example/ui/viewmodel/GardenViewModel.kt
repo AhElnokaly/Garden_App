@@ -6,8 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.data.GardenDatabase
 import com.example.data.GardenRepository
 import com.example.data.model.CareLog
+import com.example.data.model.Place
 import com.example.data.model.Plant
 import com.example.data.model.UserPlantWithDetails
+import com.example.notifications.NotificationScheduler
 import com.example.updater.GitHubAppUpdater
 import com.example.updater.UpdateState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -31,6 +33,7 @@ class GardenViewModel(application: Application) : AndroidViewModel(application) 
     private val database = GardenDatabase.getInstance(application)
     val repository = GardenRepository(
         database.plantDao(),
+        database.placeDao(),
         database.userPlantDao(),
         database.careLogDao()
     )
@@ -38,22 +41,36 @@ class GardenViewModel(application: Application) : AndroidViewModel(application) 
     val updater = GitHubAppUpdater(application)
     val updateState: StateFlow<UpdateState> = updater.updateState
 
-    // Filter for Plants List
+    // Filter for Plants List (All vs Needs Care)
     private val _currentFilter = MutableStateFlow(PlantFilter.ALL)
     val currentFilter: StateFlow<PlantFilter> = _currentFilter.asStateFlow()
+
+    // Place filter: null means All places, otherwise specific Place ID
+    private val _selectedPlaceFilterId = MutableStateFlow<Int?>(null)
+    val selectedPlaceFilterId: StateFlow<Int?> = _selectedPlaceFilterId.asStateFlow()
+
+    // List of all places
+    val allPlaces: StateFlow<List<Place>> = repository.getAllPlaces()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     // Base flow of all user plants with details
     val allUserPlants: StateFlow<List<UserPlantWithDetails>> = repository.getUserPlantsWithDetails()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    // Filtered user plants list
+    // Filtered user plants list according to care status and selected place
     val displayedUserPlants: StateFlow<List<UserPlantWithDetails>> = combine(
         allUserPlants,
-        _currentFilter
-    ) { plants, filter ->
-        when (filter) {
+        _currentFilter,
+        _selectedPlaceFilterId
+    ) { plants, filter, placeId ->
+        val careFiltered = when (filter) {
             PlantFilter.ALL -> plants
             PlantFilter.NEEDS_CARE -> plants.filter { it.needsWatering }
+        }
+        if (placeId == null) {
+            careFiltered
+        } else {
+            careFiltered.filter { it.userPlant.place_id == placeId }
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
@@ -96,11 +113,16 @@ class GardenViewModel(application: Application) : AndroidViewModel(application) 
     init {
         viewModelScope.launch {
             repository.ensurePlantsSeeded()
+            NotificationScheduler.scheduleDailyWaterCheck(application)
         }
     }
 
     fun setFilter(filter: PlantFilter) {
         _currentFilter.value = filter
+    }
+
+    fun setPlaceFilter(placeId: Int?) {
+        _selectedPlaceFilterId.value = placeId
     }
 
     fun selectUserPlant(id: Int) {
@@ -115,13 +137,14 @@ class GardenViewModel(application: Application) : AndroidViewModel(application) 
         _snackBarMessage.value = null
     }
 
-    fun addPlantToGarden(plantId: Int, nickname: String, onSuccess: () -> Unit) {
+    fun addPlantToGarden(plantId: Int, nickname: String, placeName: String, onSuccess: () -> Unit) {
         if (nickname.isBlank()) return
         viewModelScope.launch {
+            val place = repository.getOrCreatePlace(placeName.ifBlank { "البلكونة" })
             repository.addUserPlant(
                 plantId = plantId,
                 nickname = nickname.trim(),
-                place = "البلكونة"
+                placeId = place.id
             )
             _snackBarMessage.value = "تمت إضافة النبتة إلى حديقتك بنجاح 🌱"
             onSuccess()

@@ -51,6 +51,7 @@ fun AddPlantScreen(
     val availablePlants by viewModel.availablePlants.collectAsStateWithLifecycle()
     val searchQuery by viewModel.catalogSearchQuery.collectAsStateWithLifecycle()
     val selectedCategory by viewModel.catalogCategoryFilter.collectAsStateWithLifecycle()
+    val existingPlaces by viewModel.allPlaces.collectAsStateWithLifecycle()
 
     var selectedPlantForAdding by remember { mutableStateOf<Plant?>(null) }
 
@@ -175,12 +176,13 @@ fun AddPlantScreen(
             }
         }
 
-        // Dialog for specifying the pot nickname and confirming addition
+        // Dialog for specifying the pot nickname and place
         selectedPlantForAdding?.let { plant ->
             AddPlantNicknameDialog(
                 plant = plant,
-                onConfirm = { nickname ->
-                    viewModel.addPlantToGarden(plant.id, nickname) {
+                existingPlaces = existingPlaces,
+                onConfirm = { nickname, placeName ->
+                    viewModel.addPlantToGarden(plant.id, nickname, placeName) {
                         selectedPlantForAdding = null
                         onNavigateBack()
                     }

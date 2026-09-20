@@ -6,6 +6,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.example.data.GardenDatabase
 import com.example.data.InitialPlantData
 import com.example.data.model.CareLog
+import com.example.data.model.Place
 import com.example.data.model.Plant
 import com.example.data.model.UserPlant
 import kotlinx.coroutines.flow.first
@@ -58,15 +59,21 @@ class ExampleRobolectricTest {
     }
 
     @Test
-    fun `insert user plant and log care actions`() = runBlocking {
+    fun `insert places and user plant with place foreign key`() = runBlocking {
         db.plantDao().insertAll(InitialPlantData.initialPlants)
         val plantId = 1
+
+        val balconyPlaceId = db.placeDao().insertPlace(Place(name = "البلكونة"))
+        val roofPlaceId = db.placeDao().insertPlace(Place(name = "السطح"))
+
+        val allPlaces = db.placeDao().getAllPlaces().first()
+        assertEquals(2, allPlaces.size)
 
         val userPlant = UserPlant(
             id = 1,
             plant_id = plantId,
             nickname = "نعناع البلكونة",
-            place = "البلكونة",
+            place_id = balconyPlaceId.toInt(),
             added_date = System.currentTimeMillis()
         )
         db.userPlantDao().insertUserPlant(userPlant)
@@ -74,6 +81,7 @@ class ExampleRobolectricTest {
         val userPlants = db.userPlantDao().getAllUserPlants().first()
         assertEquals(1, userPlants.size)
         assertEquals("نعناع البلكونة", userPlants[0].nickname)
+        assertEquals(balconyPlaceId.toInt(), userPlants[0].place_id)
 
         // Add care log
         val log = CareLog(

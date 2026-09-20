@@ -35,8 +35,8 @@ sealed interface UpdateState {
 
 class GitHubAppUpdater(
     private val context: Context,
-    private val repoOwner: String = "yasserayasserh",
-    private val repoName: String = "garden-companion"
+    private val repoOwner: String = "AhElnokaly",
+    private val repoName: String = "Garden_App"
 ) {
     private val client = OkHttpClient.Builder()
         .connectTimeout(15, TimeUnit.SECONDS)

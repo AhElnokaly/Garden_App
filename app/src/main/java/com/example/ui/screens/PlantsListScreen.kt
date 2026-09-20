@@ -9,11 +9,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Opacity
 import androidx.compose.material.icons.filled.SystemUpdate
 import androidx.compose.material.icons.filled.Yard
@@ -63,6 +66,8 @@ fun PlantsListScreen(
 ) {
     val displayedPlants by viewModel.displayedUserPlants.collectAsStateWithLifecycle()
     val allPlants by viewModel.allUserPlants.collectAsStateWithLifecycle()
+    val allPlaces by viewModel.allPlaces.collectAsStateWithLifecycle()
+    val selectedPlaceId by viewModel.selectedPlaceFilterId.collectAsStateWithLifecycle()
     val currentFilter by viewModel.currentFilter.collectAsStateWithLifecycle()
     val updateState by viewModel.updateState.collectAsStateWithLifecycle()
     val snackMessage by viewModel.snackBarMessage.collectAsStateWithLifecycle()
@@ -164,11 +169,11 @@ fun PlantsListScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Filters Row: الكل / يحتاج عناية
+            // Care Status Filter Row: الكل / يحتاج عناية
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                    .padding(start = 16.dp, end = 16.dp, top = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 FilterChip(
@@ -211,6 +216,53 @@ fun PlantsListScreen(
                 )
             }
 
+            // Places Filter Row: جميع الأماكن / مكان 1 / مكان 2
+            if (allPlaces.isNotEmpty()) {
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 6.dp)
+                        .testTag("places_filter_row"),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    item {
+                        FilterChip(
+                            selected = selectedPlaceId == null,
+                            onClick = { viewModel.setPlaceFilter(null) },
+                            label = { Text("جميع الأماكن") },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.LocationOn,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = GreenPrimary,
+                                selectedLabelColor = Color.White,
+                                selectedLeadingIconColor = Color.White
+                            ),
+                            modifier = Modifier.testTag("filter_place_all")
+                        )
+                    }
+
+                    items(allPlaces, key = { it.id }) { place ->
+                        val countInPlace = allPlants.count { it.userPlant.place_id == place.id }
+                        FilterChip(
+                            selected = selectedPlaceId == place.id,
+                            onClick = { viewModel.setPlaceFilter(place.id) },
+                            label = { Text("${place.name} ($countInPlace)") },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = GreenPrimary,
+                                selectedLabelColor = Color.White
+                            ),
+                            modifier = Modifier.testTag("filter_place_${place.id}")
+                        )
+                    }
+                }
+            }
+
             // Plants List or Empty State
             if (displayedPlants.isEmpty()) {
                 EmptyPlantsState(
@@ -222,7 +274,7 @@ fun PlantsListScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .testTag("plants_lazy_column"),
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 88.dp),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 88.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     items(displayedPlants, key = { it.userPlant.id }) { plantItem ->

@@ -1,9 +1,11 @@
-## fix-state: Garden Companion Code Modularization (300-500 Line Ceiling)
-**تاريخ:** 2026-09-19  **App:** Garden Companion  **Version:** 0.1.1
+## fix-state: Garden Companion - CI/CD Release Pipeline & In-App Update
+
+**تاريخ:** 2026-09-20  **App:** Garden Companion  **Version:** 0.2.0
 
 | # | المهمة | Status | QA Gate | Notes |
 |---|--------|--------|---------|-------|
-| 1 | تقسيم PlantDetailScreen (665 سطر) إلى مكونات فرعية | done | PASS | تم الاستخراج إلى: PlantHeroCard (167), QuickCareActionsGrid (120), CareLogItemCard (153), PlantDetailDialogs (98). والشاشة أصبحت 247 سطر. |
-| 2 | تقسيم PlantsListScreen (574 سطر) إلى مكونات فرعية | done | PASS | تم الاستخراج إلى: UserPlantCard (177), EmptyPlantsState (97), UpdateDialog (107). والشاشة أصبحت 253 سطر. |
-| 3 | تقسيم AddPlantScreen (446 سطر) إلى مكونات فرعية | done | PASS | تم الاستخراج إلى: CatalogPlantCard (147), AddPlantNicknameDialog (163). والشاشة أصبحت 192 سطر. |
-| 4 | إنشاء CODE_INDEX وتوثيق أحجام جميع الملفات | done | PASS | أعلى ملف في المشروع بالكامل 253 سطر (أقل من الحد 300-500). تم التحقق عبر compile_applet. |
+| 1 | تصحيح إحداثيات مستودع GitHub في `GitHubAppUpdater.kt` | done | PASS | تم التحديث من `yasserayasserh/garden-companion` إلى `AhElnokaly/Garden_App` |
+| 2 | تحديث إصدار التطبيق `versionCode=2` و `versionName="0.2.0"` | done | PASS | تحديث `app/build.gradle.kts` ليتوافق مع v0.2 |
+| 3 | تفعيل KSP2 ووضع Headless في `gradle.properties` | done | PASS | إضافة `ksp.use.ksp2=true` و `-Djava.awt.headless=true` |
+| 4 | ضبط صلاحيات `permissions: contents: write` وإعداد JDK 21 في `android.yml` | done | PASS | حل مشكلة خطأ 403 وصلاحيات إنشاء الإصدار والتنزيل |
+| 5 | التحقق من صحة البناء المحلي وتنفيذ الاختبارات | done | PASS | `./gradlew assembleDebug` و `./gradlew testDebugUnitTest` نجحا بنسبة 100% |

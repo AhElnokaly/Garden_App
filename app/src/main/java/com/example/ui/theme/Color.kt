@@ -19,6 +19,10 @@ val OnSkyBlue = Color(0xFFFFFFFF)
 
 val AmberSun = Color(0xFFFFA000)
 val AmberSunContainer = Color(0xFFFFF8E1)
+val SunGold = Color(0xFFFFA000)
+
+val AlertRed = Color(0xFFD32F2F)
+val AlertRedContainer = Color(0xFFFFEBEE)
 
 val GardenBackground = Color(0xFFF8FAF8)
 val GardenSurface = Color(0xFFFFFFFF)
