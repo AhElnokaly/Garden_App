@@ -44,7 +44,7 @@ jobs:
           echo "Detected App Version: ${VERSION_NAME}"
 
       - name: Decode Keystore (if provided in secrets)
-        if: env.KEYSTORE_BASE64 != ''
+        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
