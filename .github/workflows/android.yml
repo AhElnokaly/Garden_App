@@ -14,6 +14,8 @@ jobs:
   build:
     name: Build & Release APK
     runs-on: ubuntu-latest
+    env:
+      KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
     steps:
       - name: Checkout Code
@@ -44,9 +46,7 @@ jobs:
           echo "Detected App Version: ${VERSION_NAME}"
 
       - name: Decode Keystore (if provided in secrets)
-        if: ${{ secrets.KEYSTORE_BASE64 != '' }}
-        env:
-          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        if: env.KEYSTORE_BASE64 != ''
         run: |
           echo "${KEYSTORE_BASE64}" | base64 --decode > debug.keystore
 
