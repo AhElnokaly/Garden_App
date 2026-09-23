@@ -23,18 +23,14 @@ android {
   }
 
   signingConfigs {
+    // Only used once a release keystore + secrets exist (KEYSTORE_PATH / STORE_PASSWORD /
+    // KEY_PASSWORD). Not wired into a buildType yet — see notes in the CI workflow.
     create("release") {
       val keystorePath = System.getenv("KEYSTORE_PATH") ?: "${rootDir}/my-upload-key.jks"
       storeFile = file(keystorePath)
       storePassword = System.getenv("STORE_PASSWORD")
       keyAlias = "upload"
       keyPassword = System.getenv("KEY_PASSWORD")
-    }
-    create("debugConfig") {
-      storeFile = file("${rootDir}/debug.keystore")
-      storePassword = "android"
-      keyAlias = "androiddebugkey"
-      keyPassword = "android"
     }
   }
 
@@ -45,7 +41,9 @@ android {
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
       signingConfig = signingConfigs.getByName("release")
     }
-    debug { signingConfig = signingConfigs.getByName("debugConfig") }
+    // debug buildType intentionally left without an explicit signingConfig — AGP auto-signs
+    // it with a debug keystore it generates itself (locally and on CI), so no debug.keystore
+    // secret/decode step is needed for debug builds at all.
   }
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_11
