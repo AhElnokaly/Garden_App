@@ -1,5 +1,8 @@
 package com.example.ui.screens
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,10 +40,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ui.components.AddCareNoteDialog
 import com.example.ui.components.CareLogItemCard
@@ -49,6 +54,7 @@ import com.example.ui.components.PlantHeroCard
 import com.example.ui.components.QuickCareActionsGrid
 import com.example.ui.theme.GreenPrimary
 import com.example.ui.viewmodel.GardenViewModel
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,9 +71,32 @@ fun PlantDetailScreen(
     val careLogs by viewModel.selectedPlantCareLogs.collectAsStateWithLifecycle()
     val snackMessage by viewModel.snackBarMessage.collectAsStateWithLifecycle()
 
+    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
     var showAddNoteDialog by remember { mutableStateOf(false) }
+
+    var currentPhotoFile by remember { mutableStateOf<File?>(null) }
+    var currentPhotoUri by remember { mutableStateOf<Uri?>(null) }
+
+    val takePictureLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        val file = currentPhotoFile
+        val uri = currentPhotoUri
+        if (success && uri != null) {
+            plantDetails?.userPlant?.id?.let { id ->
+                viewModel.logPhoto(id, photoUri = uri.toString())
+            }
+        } else {
+            // Cancelled or failed -> delete empty file to prevent orphan files
+            if (file != null && file.exists()) {
+                file.delete()
+            }
+        }
+        currentPhotoFile = null
+        currentPhotoUri = null
+    }
 
     LaunchedEffect(snackMessage) {
         snackMessage?.let {
@@ -156,7 +185,17 @@ fun PlantDetailScreen(
                     QuickCareActionsGrid(
                         onWater = { viewModel.logWatered(item.userPlant.id) },
                         onFertilize = { viewModel.logFertilized(item.userPlant.id) },
-                        onPhoto = { viewModel.logPhoto(item.userPlant.id) },
+                        onPhoto = {
+                            val photoFile = File(
+                                context.filesDir,
+                                "plant_photo_${item.userPlant.id}_${System.currentTimeMillis()}.jpg"
+                            )
+                            val authority = "${context.packageName}.fileprovider"
+                            val photoUri = FileProvider.getUriForFile(context, authority, photoFile)
+                            currentPhotoFile = photoFile
+                            currentPhotoUri = photoUri
+                            takePictureLauncher.launch(photoUri)
+                        },
                         onNote = { showAddNoteDialog = true }
                     )
                 }

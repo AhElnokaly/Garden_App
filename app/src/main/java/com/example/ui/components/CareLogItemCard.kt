@@ -29,8 +29,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.data.model.CareLog
 import com.example.ui.theme.SkyBlueContainer
 import com.example.ui.theme.SkyBlueWater
@@ -112,18 +116,34 @@ fun CareLogItemCard(
                     )
                 }
 
-                if (!log.photo_uri.isNullOrBlank() && log.action_type == "photo") {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Surface(
-                        shape = RoundedCornerShape(6.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant
-                    ) {
-                        Text(
-                            text = "📷 صورة موثقة في المعرض المحلي",
-                            style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                if (log.action_type == "photo") {
+                    Spacer(modifier = Modifier.height(6.dp))
+                    val hasValidUri = !log.photo_uri.isNullOrBlank() && !log.photo_uri.startsWith("local_photo_")
+                    if (hasValidUri) {
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(log.photo_uri)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = "صورة النبتة المسجلة",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(120.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop
                         )
+                    } else {
+                        Surface(
+                            shape = RoundedCornerShape(6.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant
+                        ) {
+                            Text(
+                                text = "📷 صورة موثقة في المعرض المحلي",
+                                style = MaterialTheme.typography.labelSmall,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             }

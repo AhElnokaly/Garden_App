@@ -54,7 +54,7 @@ private val DarkColorScheme = darkColorScheme(
     onSurface = GardenTextPrimaryDark,
     surfaceVariant = GardenSurfaceVariantDark,
     onSurfaceVariant = GardenTextSecondaryDark,
-    outline = GardenOutline
+    outline = GardenOutlineDark
 )
 
 @Composable
@@ -77,6 +77,7 @@ fun GardenCompanionTheme(
         MaterialTheme(
             colorScheme = colorScheme,
             typography = Typography,
+            shapes = GardenShapes,
             content = content
         )
     }
