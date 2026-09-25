@@ -298,6 +298,13 @@ fun PlantsListScreen(
                 },
                 onDownload = { url ->
                     viewModel.downloadAndInstallUpdate(url)
+                },
+                onCancelDownload = {
+                    viewModel.cancelUpdateDownload()
+                    showUpdateDialog = false
+                },
+                onInstall = { apkFile ->
+                    viewModel.updater.installApk(apkFile)
                 }
             )
         }

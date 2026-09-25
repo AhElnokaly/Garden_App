@@ -7,7 +7,10 @@ import android.os.Build
 import android.provider.Settings
 import androidx.core.content.FileProvider
 import com.example.BuildConfig
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -133,6 +136,7 @@ class GitHubAppUpdater(
                     var bytesRead: Int
                     var totalRead: Long = 0
                     while (input.read(buffer).also { bytesRead = it } != -1) {
+                        currentCoroutineContext().ensureActive()
                         output.write(buffer, 0, bytesRead)
                         totalRead += bytesRead
                         if (contentLength > 0) {
@@ -146,9 +150,27 @@ class GitHubAppUpdater(
 
             _updateState.value = UpdateState.ReadyToInstall(apkFile)
             installApk(apkFile)
+        } catch (e: CancellationException) {
+            cleanupTempFiles()
+            _updateState.value = UpdateState.Idle
         } catch (e: Exception) {
             _updateState.value = UpdateState.Error("خطأ في تنزيل التحديث: ${e.localizedMessage}")
         }
+    }
+
+    fun cancelDownload() {
+        cleanupTempFiles()
+        _updateState.value = UpdateState.Idle
+    }
+
+    private fun cleanupTempFiles() {
+        try {
+            val cacheDir = File(context.cacheDir, "updates")
+            val apkFile = File(cacheDir, "GardenCompanion_update.apk")
+            if (apkFile.exists()) {
+                apkFile.delete()
+            }
+        } catch (_: Exception) {}
     }
 
     fun installApk(apkFile: File) {

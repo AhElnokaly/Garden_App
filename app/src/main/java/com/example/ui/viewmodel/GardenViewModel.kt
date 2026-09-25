@@ -196,6 +196,8 @@ class GardenViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    private var updateDownloadJob: kotlinx.coroutines.Job? = null
+
     fun checkForUpdates() {
         viewModelScope.launch {
             updater.checkForUpdates()
@@ -203,8 +205,15 @@ class GardenViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun downloadAndInstallUpdate(url: String) {
-        viewModelScope.launch {
+        updateDownloadJob?.cancel()
+        updateDownloadJob = viewModelScope.launch {
             updater.downloadAndInstallApk(url)
         }
+    }
+
+    fun cancelUpdateDownload() {
+        updateDownloadJob?.cancel()
+        updateDownloadJob = null
+        updater.cancelDownload()
     }
 }

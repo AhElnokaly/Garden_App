@@ -16,21 +16,39 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import com.example.BuildConfig
 import com.example.ui.theme.GreenPrimary
 import com.example.updater.UpdateState
+import java.io.File
 
 @Composable
 fun UpdateDialog(
     updateState: UpdateState,
     onDismiss: () -> Unit,
-    onDownload: (String) -> Unit
+    onDownload: (String) -> Unit,
+    onCancelDownload: () -> Unit = onDismiss,
+    onInstall: (File) -> Unit = {}
 ) {
+    val isBusy = updateState is UpdateState.Downloading || updateState is UpdateState.ReadyToInstall
+
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            if (!isBusy) {
+                onDismiss()
+            }
+        },
+        properties = DialogProperties(
+            dismissOnBackPress = !isBusy,
+            dismissOnClickOutside = !isBusy
+        ),
         title = {
             Text(
-                text = "تحديث التطبيق",
+                text = when (updateState) {
+                    is UpdateState.Downloading -> "جاري تنزيل التحديث"
+                    is UpdateState.ReadyToInstall -> "اكتمل التنزيل بنجاح"
+                    else -> "تحديث التطبيق"
+                },
                 fontWeight = FontWeight.Bold
             )
         },
@@ -64,43 +82,81 @@ fun UpdateDialog(
                     Text("أنت تستخدم أحدث إصدار من تطبيق رفيق الحديقة (v${BuildConfig.VERSION_NAME}).")
                 }
                 is UpdateState.Downloading -> {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                         Text("جاري تنزيل ملف التحديث... ${updateState.progressPercent}%")
                         LinearProgressIndicator(
                             progress = { updateState.progressPercent / 100f },
                             modifier = Modifier.fillMaxWidth(),
                             color = GreenPrimary
                         )
+                        Text(
+                            text = "يرجى الانتظار حتى اكتمال التنزيل، ولا تغلق التطبيق.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
                 is UpdateState.ReadyToInstall -> {
-                    Text("تم تنزيل التحديث بنجاح. سيتم فتح برنامج التثبيت الآن.")
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("تم تنزيل ملف التحديث بنجاح.")
+                        Text(
+                            text = "اضغط على \"تثبيت التحديث الآن\" للبدء.",
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
                 is UpdateState.Error -> {
-                    Text("تعذر إتمام الفحص: ${updateState.message}")
+                    Text("تعذر إتمام العملية: ${updateState.message}")
                 }
                 UpdateState.Idle -> {}
             }
         },
         confirmButton = {
-            if (updateState is UpdateState.UpdateAvailable) {
-                Button(
-                    onClick = { onDownload(updateState.downloadUrl) },
-                    colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary)
-                ) {
-                    Text("تنزيل وتثبيت")
+            when (updateState) {
+                is UpdateState.UpdateAvailable -> {
+                    Button(
+                        onClick = { onDownload(updateState.downloadUrl) },
+                        colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary)
+                    ) {
+                        Text("تنزيل وتثبيت")
+                    }
                 }
-            } else {
-                TextButton(onClick = onDismiss) {
-                    Text("حسناً")
+                is UpdateState.ReadyToInstall -> {
+                    Button(
+                        onClick = { onInstall(updateState.apkFile) },
+                        colors = ButtonDefaults.buttonColors(containerColor = GreenPrimary)
+                    ) {
+                        Text("تثبيت التحديث الآن")
+                    }
+                }
+                is UpdateState.Downloading -> {
+                    // Hidden during download to prevent accidental confirmation
+                }
+                else -> {
+                    TextButton(onClick = onDismiss) {
+                        Text("حسناً")
+                    }
                 }
             }
         },
         dismissButton = {
-            if (updateState is UpdateState.UpdateAvailable) {
-                TextButton(onClick = onDismiss) {
-                    Text("لاحقاً")
+            when (updateState) {
+                is UpdateState.UpdateAvailable -> {
+                    TextButton(onClick = onDismiss) {
+                        Text("لاحقاً")
+                    }
                 }
+                is UpdateState.Downloading -> {
+                    TextButton(onClick = onCancelDownload) {
+                        Text("إلغاء التنزيل")
+                    }
+                }
+                is UpdateState.ReadyToInstall -> {
+                    TextButton(onClick = onDismiss) {
+                        Text("إغلاق")
+                    }
+                }
+                else -> {}
             }
         }
     )
