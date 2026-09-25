@@ -14,8 +14,8 @@ android {
     applicationId = "com.aistudio.gardencompanion.vxqzt"
     minSdk = 24
     targetSdk = 36
-    versionCode = 4
-    versionName = "0.2.2"
+    versionCode = 5
+    versionName = "0.2.3"
 
     buildConfigField("boolean", "AI_ENABLED", "false")
 
@@ -41,9 +41,14 @@ android {
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
       signingConfig = signingConfigs.getByName("release")
     }
-    // debug buildType intentionally left without an explicit signingConfig — AGP auto-signs
-    // it with a debug keystore it generates itself (locally and on CI), so no debug.keystore
-    // secret/decode step is needed for debug builds at all.
+    debug {
+      signingConfig = signingConfigs.create("debugConfig") {
+        storeFile = file("${rootDir}/debug.keystore")
+        storePassword = "android"
+        keyAlias = "androiddebugkey"
+        keyPassword = "android"
+      }
+    }
   }
   compileOptions {
     sourceCompatibility = JavaVersion.VERSION_11
