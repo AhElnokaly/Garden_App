@@ -49,13 +49,14 @@ jobs:
         run: |
           mkdir -p ~/.android
           echo "Setting up persistent debug keystore for consistent signing..."
-          if [ -n "$KEYSTORE_BASE64" ]; then
-            echo "$KEYSTORE_BASE64" | tr -d '\r\n ' | base64 -d > ~/.android/debug.keystore
-            echo "Debug keystore restored from GitHub Secret."
-          elif [ -f "debug.keystore.base64" ]; then
-            cat debug.keystore.base64 | tr -d '\r\n ' | base64 -d > ~/.android/debug.keystore
+          if [ -f "debug.keystore.base64" ]; then
+            cat debug.keystore.base64 | tr -d '\r\n ' | base64 -di > ~/.android/debug.keystore
             echo "Debug keystore restored from repository file."
+          elif [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | tr -d '\r\n ' | base64 -di > ~/.android/debug.keystore
+            echo "Debug keystore restored from GitHub Secret."
           fi
+          keytool -list -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey
 
       - name: Build Debug APK with Gradle
         run: |
