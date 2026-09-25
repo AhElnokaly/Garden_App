@@ -49,13 +49,29 @@ jobs:
         run: |
           mkdir -p ~/.android
           echo "Setting up persistent debug keystore for consistent signing..."
-          if [ -f "debug.keystore.base64" ]; then
-            cat debug.keystore.base64 | tr -d '\r\n ' | base64 -di > ~/.android/debug.keystore
-            echo "Debug keystore restored from repository file."
-          elif [ -n "$KEYSTORE_BASE64" ]; then
-            echo "$KEYSTORE_BASE64" | tr -d '\r\n ' | base64 -di > ~/.android/debug.keystore
-            echo "Debug keystore restored from GitHub Secret."
-          fi
+          python3 -c "
+          import os, base64
+          raw = ''
+          if os.path.exists('debug.keystore.base64'):
+              with open('debug.keystore.base64', 'r') as f:
+                  raw = f.read()
+              print('Source: debug.keystore.base64 file')
+          elif os.environ.get('KEYSTORE_BASE64'):
+              raw = os.environ.get('KEYSTORE_BASE64', '')
+              print('Source: GitHub Secret KEYSTORE_BASE64')
+          cleaned = ''.join(raw.split())
+          if cleaned:
+              padding = len(cleaned) % 4
+              if padding:
+                  cleaned += '=' * (4 - padding)
+              target = os.path.expanduser('~/.android/debug.keystore')
+              os.makedirs(os.path.dirname(target), exist_ok=True)
+              with open(target, 'wb') as f:
+                  f.write(base64.b64decode(cleaned))
+              print('Successfully wrote keystore.')
+          else:
+              print('Warning: No keystore base64 data found.')
+          "
           keytool -list -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey
 
       - name: Build Debug APK with Gradle
