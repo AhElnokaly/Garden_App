@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.EditNote
@@ -28,8 +27,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ui.theme.GreenPrimary
 import com.example.ui.theme.SkyBlueWater
 import com.example.ui.theme.SoilBrownSecondary
+import com.example.ui.theme.Terracotta
 
 @Composable
 fun QuickCareActionsGrid(
@@ -65,7 +66,7 @@ fun QuickCareActionsGrid(
 
         QuickActionButton(
             label = "صوّرت 📸",
-            containerColor = Color(0xFF00897B),
+            containerColor = GreenPrimary,
             icon = Icons.Default.CameraAlt,
             onClick = onPhoto,
             modifier = Modifier
@@ -75,7 +76,7 @@ fun QuickCareActionsGrid(
 
         QuickActionButton(
             label = "ملاحظة 📝",
-            containerColor = Color(0xFF5E35B1),
+            containerColor = Terracotta,
             icon = Icons.Default.EditNote,
             onClick = onNote,
             modifier = Modifier
@@ -96,7 +97,7 @@ fun QuickActionButton(
     Button(
         onClick = onClick,
         modifier = modifier.height(64.dp),
-        shape = RoundedCornerShape(14.dp),
+        shape = MaterialTheme.shapes.small,
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
             contentColor = Color.White

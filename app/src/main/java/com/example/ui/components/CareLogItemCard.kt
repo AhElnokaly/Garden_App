@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.EditNote
@@ -36,10 +35,14 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.data.model.CareLog
+import com.example.ui.theme.GreenContainer
+import com.example.ui.theme.GreenPrimary
 import com.example.ui.theme.SkyBlueContainer
 import com.example.ui.theme.SkyBlueWater
 import com.example.ui.theme.SoilBrownContainer
 import com.example.ui.theme.SoilBrownSecondary
+import com.example.ui.theme.Terracotta
+import com.example.ui.theme.TerracottaContainer
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -52,13 +55,13 @@ fun CareLogItemCard(
     val (icon, tintColor, bgContainer, title) = when (log.action_type) {
         "watered" -> Quadruple(Icons.Default.Opacity, SkyBlueWater, SkyBlueContainer, "سقاية وري بالماء")
         "fertilized" -> Quadruple(Icons.Default.Science, SoilBrownSecondary, SoilBrownContainer, "تسميد بالمغذيات")
-        "photo" -> Quadruple(Icons.Default.CameraAlt, Color(0xFF00897B), Color(0xFFE0F2F1), "التقاط صورة للنمو")
-        else -> Quadruple(Icons.Default.EditNote, Color(0xFF5E35B1), Color(0xFFEDE7F6), "ملاحظة عناية")
+        "photo" -> Quadruple(Icons.Default.CameraAlt, GreenPrimary, GreenContainer, "التقاط صورة للنمو")
+        else -> Quadruple(Icons.Default.EditNote, Terracotta, TerracottaContainer, "ملاحظة عناية")
     }
 
     Card(
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(14.dp),
+        shape = MaterialTheme.shapes.medium,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
@@ -129,12 +132,12 @@ fun CareLogItemCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(120.dp)
-                                .clip(RoundedCornerShape(8.dp)),
+                                .clip(MaterialTheme.shapes.extraSmall),
                             contentScale = ContentScale.Crop
                         )
                     } else {
                         Surface(
-                            shape = RoundedCornerShape(6.dp),
+                            shape = MaterialTheme.shapes.extraSmall,
                             color = MaterialTheme.colorScheme.surfaceVariant
                         ) {
                             Text(
