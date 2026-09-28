@@ -50,8 +50,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ui.components.AddCareNoteDialog
 import com.example.ui.components.CareLogItemCard
 import com.example.ui.components.DeletePlantConfirmDialog
+import com.example.ui.components.GardenMemoryCard
+import com.example.ui.components.PlantGrowthGauge
 import com.example.ui.components.PlantHeroCard
+import com.example.ui.components.PlantStageTimeline
 import com.example.ui.components.QuickCareActionsGrid
+import com.example.ui.theme.GardenBackground
 import com.example.ui.theme.GreenPrimary
 import com.example.ui.viewmodel.GardenViewModel
 import java.io.File
@@ -142,12 +146,12 @@ fun PlantDetailScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
+                    containerColor = GardenBackground
                 )
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = GardenBackground
     ) { paddingValues ->
         if (plantDetails == null) {
             Box(
@@ -165,12 +169,50 @@ fun PlantDetailScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
                     .testTag("detail_lazy_column"),
-                contentPadding = PaddingValues(16.dp),
+                contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 48.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 // Hero Plant Header Card
                 item {
                     PlantHeroCard(item = item)
+                }
+
+                // Growth Gauge & State (Mockup Inspired)
+                item {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Text(
+                            text = "تنمو بجمال وصحة 🌱",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = GreenPrimary
+                        )
+                        PlantGrowthGauge(
+                            percentage = 68
+                        )
+                    }
+                }
+
+                // Stage Timeline
+                item {
+                    PlantStageTimeline(
+                        stageName = "مرحلة نمو خضري نشط 🌿",
+                        nextMilestoneTitle = "تفرع 4 أوراق جديدة",
+                        estimatedDays = "خلال 5-8 أيام"
+                    )
+                }
+
+                // Garden Memory Intelligence Card
+                item {
+                    GardenMemoryCard(
+                        note = "تنمو نبتة ${item.plant.name_ar} بشكل أفضل مع شمس الصباح المشرقة وري معتدل كل 2-3 أيام.",
+                        confidence = "دقة الملاحظة: عالية 🌿"
+                    )
                 }
 
                 // Quick Care Action Buttons (4 Buttons as specified)

@@ -151,6 +151,15 @@ class GardenViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+    fun createPlace(name: String, onSuccess: () -> Unit = {}) {
+        if (name.isBlank()) return
+        viewModelScope.launch {
+            repository.getOrCreatePlace(name.trim())
+            _snackBarMessage.value = "تمت إضافة المكان الزراعي بنجاح 🏡"
+            onSuccess()
+        }
+    }
+
     fun deleteUserPlant(id: Int, onDeleted: () -> Unit) {
         viewModelScope.launch {
             repository.deleteUserPlant(id)

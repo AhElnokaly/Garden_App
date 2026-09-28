@@ -1,13 +1,14 @@
-## fix-state: Garden Companion - In-App Update UX & CI Signing Fix (v0.2.2)
+## fix-state: Garden Companion - UI/UX Mockup Redesign (v0.2.4)
 
-**تاريخ:** 2026-09-25  **App:** Garden Companion  **Version:** 0.2.2
+**تاريخ:** 2026-09-25  **App:** Garden Companion  **Version:** 0.2.4
 
 | # | المهمة | Status | QA Gate | Notes |
 |---|--------|--------|---------|-------|
-| 1 | استبدال containerColor والأشكال في `QuickCareActionsGrid.kt` بتوكنز التصميم | done | PASS | استخدام SkyBlueWater, SoilBrownSecondary, GreenPrimary, Terracotta و MaterialTheme.shapes.small |
-| 2 | استبدال الألوان الهاردكود والأشكال في `CareLogItemCard.kt` بتوكنز التصميم | done | PASS | استخدام GreenPrimary/Container, Terracotta/Container و MaterialTheme.shapes (medium & extraSmall) |
-| 3 | تحسين شاشة التنزيل ومنع إغلاقها العرضي مع دعم الإلغاء والتثبيت المباشر | done | PASS | `DialogProperties(dismissOnClickOutside = false, dismissOnBackPress = false)` أثناء التحميل، وزر إلغاء صريح، وحالة التثبيت المباشر |
-| 4 | دعم إلغاء التحميل وتنظيف الموارد في `GitHubAppUpdater` و `GardenViewModel` | done | PASS | إضافة `cancelDownload()`، حذف الملف المؤقت غير المكتمل، تتبع `updateDownloadJob` في الـ ViewModel |
-| 5 | تثبيت مفتاح التوقيع الرقمي الموحد في سير عمل GitHub Actions | done | PASS | حقن keystore ثابت ومحدد في `~/.android/debug.keystore` في `android.yml` لتوحيد بصمة SHA-256 للملفات |
-| 6 | رفع رقم الإصدار إلى `versionCode=4` و `versionName="0.2.2"` | done | PASS | تحديث `app/build.gradle.kts` ليكون v0.2.2 متوافق مع Release القادم |
-| 7 | التحقق من صحة البناء المحلي وتنفيذ الاختبارات | done | PASS | تم التحقق بنجاح محلياً |
+| 1 | تحديث لوحة الألوان والسمات والأشكال (Design System & Theme) | done | PASS | Color.kt, Shapes.kt, Theme.kt - خلفية كريمية organic دافئة وتوكنز بيئية كاملة |
+| 2 | شريط التنقل السفلي المطور مع الزر المركزي (App Bottom Bar & Center FAB) | done | PASS | GardenBottomBar.kt, MainActivity.kt - 4 تبويبات وزر إضافة دائري مرتفع بارز |
+| 3 | مكونات الشاشة الرئيسية (Weather Card, Hero Banner, Today Tasks) | done | PASS | GardenWeatherCard.kt, GardenHeroBanner.kt, TodayCareTaskCard.kt |
+| 4 | تجديد الشاشة الرئيسية بالكامل (Home Screen Redesign) | done | PASS | PlantsListScreen.kt - تحية مخصصة، بطاقة طقس، بانر، مهام اليوم، فلاتر الرعاية والأماكن |
+| 5 | شاشة أماكن الزراعة (My Places Screen & Environmental Badges) | done | PASS | PlacesScreen.kt, PlaceItemCard.kt - شارات البيئة (شمس، رياح، حرارة) وزر إضافة مكان |
+| 6 | تحديث شاشة تفاصيل النبتة (Growth Gauge & Milestone Journey) | done | PASS | PlantDetailScreen.kt, PlantGrowthGauge.kt, PlantStageTimeline.kt, GardenMemoryCard |
+
+

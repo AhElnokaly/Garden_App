@@ -14,3 +14,5 @@ val GardenShapes = Shapes(
 
 // Named aliases for direct use in components (pills, chips)
 val PillShape = RoundedCornerShape(100.dp)
+val CardShape = RoundedCornerShape(22.dp)
+val BottomBarShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
