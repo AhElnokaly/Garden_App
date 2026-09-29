@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.WbCloudy
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -24,6 +25,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.data.model.DataSource
 import com.example.ui.theme.AmberSun
 import com.example.ui.theme.AmberSunContainer
 import com.example.ui.theme.CardShape
@@ -34,9 +36,10 @@ import com.example.ui.theme.PillShape
 
 @Composable
 fun GardenWeatherCard(
-    temperature: String = "31°C",
-    condition: String = "مشمس",
-    conditionNote: String = "ظروف نمو ممتازة",
+    temperature: String = "--°C",
+    condition: String = "بانتظار مستشعر البيئة",
+    conditionNote: String = "محرك الطقس والمناخ قيد التأسيس في v0.4",
+    dataSource: DataSource = DataSource.PROTOTYPE,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -58,9 +61,10 @@ fun GardenWeatherCard(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(14.dp)
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
+                modifier = Modifier.weight(1f)
             ) {
-                // Sun Icon Container
+                // Weather / Sensor Icon Container
                 Box(
                     modifier = Modifier
                         .size(46.dp)
@@ -69,10 +73,10 @@ fun GardenWeatherCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Default.WbSunny,
+                        imageVector = if (dataSource == DataSource.PROTOTYPE) Icons.Default.WbCloudy else Icons.Default.WbSunny,
                         contentDescription = "حالة الطقس",
                         tint = AmberSun,
-                        modifier = Modifier.size(26.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                 }
 
@@ -84,7 +88,7 @@ fun GardenWeatherCard(
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         Text(
-                            text = "اليوم",
+                            text = "الطقس",
                             style = MaterialTheme.typography.bodySmall,
                             color = GardenTextMuted,
                             fontSize = 12.sp
@@ -100,24 +104,35 @@ fun GardenWeatherCard(
                         text = conditionNote,
                         style = MaterialTheme.typography.bodySmall,
                         color = GardenTextMuted,
-                        fontSize = 12.sp
+                        fontSize = 11.sp
                     )
                 }
             }
 
-            // Condition Tag (e.g. Sunny / مشمس)
-            Box(
-                modifier = Modifier
-                    .clip(PillShape)
-                    .background(AmberSunContainer)
-                    .padding(horizontal = 12.dp, vertical = 6.dp)
+            // Condition Tag with Data Source Clarity
+            Column(
+                horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
+                Box(
+                    modifier = Modifier
+                        .clip(PillShape)
+                        .background(AmberSunContainer)
+                        .padding(horizontal = 10.dp, vertical = 5.dp)
+                ) {
+                    Text(
+                        text = condition,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = AmberSun,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 11.sp
+                    )
+                }
                 Text(
-                    text = condition,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = AmberSun,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 12.sp
+                    text = if (dataSource == DataSource.PROTOTYPE) "بيانات نموذج أولي" else dataSource.name,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = GardenTextMuted,
+                    fontSize = 9.sp
                 )
             }
         }

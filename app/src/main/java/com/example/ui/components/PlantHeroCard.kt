@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Opacity
 import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material.icons.filled.Yard
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -149,6 +150,26 @@ fun PlantHeroCard(item: UserPlantWithDetails) {
                     )
                     Text(
                         text = item.placeName,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(
+                        imageVector = Icons.Default.Yard,
+                        contentDescription = null,
+                        tint = GreenPrimary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "الأصيص",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = item.containerName,
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Bold
                     )

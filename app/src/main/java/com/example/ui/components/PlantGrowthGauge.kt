@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.data.model.DataSource
 import com.example.ui.theme.AmberSun
 import com.example.ui.theme.AmberSunContainer
 import com.example.ui.theme.CardShape
@@ -50,6 +51,7 @@ import com.example.ui.theme.PillShape
 @Composable
 fun PlantGrowthGauge(
     percentage: Int = 68,
+    dataSource: DataSource = DataSource.ESTIMATED,
     modifier: Modifier = Modifier
 ) {
     val animatedProgress by animateFloatAsState(
@@ -97,6 +99,12 @@ fun PlantGrowthGauge(
                 style = MaterialTheme.typography.labelSmall,
                 color = GardenTextMuted,
                 fontSize = 11.sp
+            )
+            Text(
+                text = if (dataSource == DataSource.ESTIMATED) "تقديري" else if (dataSource == DataSource.PROTOTYPE) "تجريبي" else dataSource.name,
+                style = MaterialTheme.typography.labelSmall,
+                color = AmberSun,
+                fontSize = 9.sp
             )
         }
     }

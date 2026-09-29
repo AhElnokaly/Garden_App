@@ -16,6 +16,9 @@ interface UserPlantDao {
     @Query("SELECT * FROM user_plants WHERE id = :id LIMIT 1")
     fun getUserPlantById(id: Int): Flow<UserPlant?>
 
+    @Query("SELECT * FROM user_plants WHERE container_id = :containerId ORDER BY added_date DESC")
+    fun getUserPlantsByContainerId(containerId: Int): Flow<List<UserPlant>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertUserPlant(userPlant: UserPlant): Long
 

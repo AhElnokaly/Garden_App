@@ -177,8 +177,10 @@ fun PlantDetailScreen(
                     PlantHeroCard(item = item)
                 }
 
-                // Growth Gauge & State (Mockup Inspired)
+                // Growth Gauge & State (Calculated from added date)
                 item {
+                    val daysSinceAdded = ((System.currentTimeMillis() - item.userPlant.added_date) / (1000L * 60 * 60 * 24)).toInt()
+                    val growthPercent = (25 + (daysSinceAdded * 5)).coerceIn(10, 95)
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -193,7 +195,8 @@ fun PlantDetailScreen(
                             color = GreenPrimary
                         )
                         PlantGrowthGauge(
-                            percentage = 68
+                            percentage = growthPercent,
+                            dataSource = com.example.data.model.DataSource.CALCULATED
                         )
                     }
                 }

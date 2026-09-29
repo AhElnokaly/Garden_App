@@ -6,8 +6,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.data.GardenDatabase
 import com.example.data.GardenRepository
 import com.example.data.model.CareLog
+import com.example.data.model.ContainerType
+import com.example.data.model.Garden
+import com.example.data.model.GrowingMethod
 import com.example.data.model.Place
 import com.example.data.model.Plant
+import com.example.data.model.PlantContainer
+import com.example.data.model.SoilProfile
 import com.example.data.model.UserPlantWithDetails
 import com.example.notifications.NotificationScheduler
 import com.example.updater.GitHubAppUpdater
@@ -33,9 +38,13 @@ class GardenViewModel(application: Application) : AndroidViewModel(application) 
     private val database = GardenDatabase.getInstance(application)
     val repository = GardenRepository(
         database.plantDao(),
+        database.gardenDao(),
         database.placeDao(),
+        database.containerDao(),
         database.userPlantDao(),
-        database.careLogDao()
+        database.careLogDao(),
+        database.soilProfileDao(),
+        database.soilComponentDao()
     )
 
     val updater = GitHubAppUpdater(application)
@@ -49,8 +58,15 @@ class GardenViewModel(application: Application) : AndroidViewModel(application) 
     private val _selectedPlaceFilterId = MutableStateFlow<Int?>(null)
     val selectedPlaceFilterId: StateFlow<Int?> = _selectedPlaceFilterId.asStateFlow()
 
+    // Garden & Place & Container domain flows
+    val defaultGarden: StateFlow<Garden?> = repository.getDefaultGarden()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
     // List of all places
     val allPlaces: StateFlow<List<Place>> = repository.getAllPlaces()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val allContainers: StateFlow<List<PlantContainer>> = repository.getAllContainers()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     // Base flow of all user plants with details
@@ -70,7 +86,7 @@ class GardenViewModel(application: Application) : AndroidViewModel(application) 
         if (placeId == null) {
             careFiltered
         } else {
-            careFiltered.filter { it.userPlant.place_id == placeId }
+            careFiltered.filter { it.place?.id == placeId }
         }
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
@@ -137,16 +153,51 @@ class GardenViewModel(application: Application) : AndroidViewModel(application) 
         _snackBarMessage.value = null
     }
 
-    fun addPlantToGarden(plantId: Int, nickname: String, placeName: String, onSuccess: () -> Unit) {
+    fun addPlantToGarden(
+        plantId: Int,
+        nickname: String,
+        placeName: String,
+        containerName: String? = null,
+        growingMethod: GrowingMethod = GrowingMethod.SOIL,
+        onSuccess: () -> Unit
+    ) {
         if (nickname.isBlank()) return
         viewModelScope.launch {
             val place = repository.getOrCreatePlace(placeName.ifBlank { "البلكونة" })
             repository.addUserPlant(
                 plantId = plantId,
                 nickname = nickname.trim(),
-                placeId = place.id
+                placeId = place.id,
+                containerName = containerName,
+                growingMethod = growingMethod
             )
             _snackBarMessage.value = "تمت إضافة النبتة إلى حديقتك بنجاح 🌱"
+            onSuccess()
+        }
+    }
+
+    fun addPlantToGarden(plantId: Int, nickname: String, placeName: String, onSuccess: () -> Unit) {
+        addPlantToGarden(
+            plantId = plantId,
+            nickname = nickname,
+            placeName = placeName,
+            containerName = null,
+            growingMethod = GrowingMethod.SOIL,
+            onSuccess = onSuccess
+        )
+    }
+
+    fun addContainer(
+        placeId: Int,
+        name: String,
+        type: ContainerType = ContainerType.POT,
+        growingMethod: GrowingMethod = GrowingMethod.SOIL,
+        onSuccess: () -> Unit = {}
+    ) {
+        if (name.isBlank()) return
+        viewModelScope.launch {
+            repository.addContainer(placeId, name, type, growingMethod)
+            _snackBarMessage.value = "تمت إضافة الأصيص بنجاح 🪴"
             onSuccess()
         }
     }

@@ -334,7 +334,7 @@ fun PlantsListScreen(
                             }
 
                             items(allPlaces, key = { it.id }) { place ->
-                                val countInPlace = allPlants.count { it.userPlant.place_id == place.id }
+                                val countInPlace = allPlants.count { it.place?.id == place.id }
                                 FilterChip(
                                     selected = selectedPlaceId == place.id,
                                     onClick = { viewModel.setPlaceFilter(place.id) },

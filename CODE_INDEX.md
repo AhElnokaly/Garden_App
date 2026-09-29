@@ -1,7 +1,7 @@
 # CODE INDEX — Garden Companion (رفيق الحديقة)
 
 > **قاعدة الحجم:** جميع الملفات أقل من 300 سطر (الحد الأقصى المسموح به 300 - 500 سطر).
-> **آخر تحديث:** 2026-09-25 (إصدار v0.2.2)
+> **آخر تحديث:** 2026-09-28 (إصدار v0.3.0 - Garden Domain Foundation)
 
 ---
 
@@ -19,13 +19,13 @@
 | File | Lines | Description & Responsibilities |
 |---|---|---|
 | `GardenBottomBar.kt` | 170 | شريط التنقل السفلي الأيقوني مع زر (+) الدائري البارز في المنتصف |
-| `GardenWeatherCard.kt` | 115 | بطاقة حالة الطقس ودرجة الحرارة وظروف النمو اليومية |
+| `GardenWeatherCard.kt` | 115 | بطاقة حالة الطقس مع مصدر البيانات DataSource.PROTOTYPE بدقة |
 | `GardenHeroBanner.kt` | 110 | بانر "عالم الحديقة" الاستكشافي الملون مع الأيقونة المائية والزر الدائري |
 | `TodayCareTaskCard.kt` | 125 | بطاقات مهام اليوم في الحديقة (ماء، شمس، مراحل نمو جديدة) |
 | `PlaceItemCard.kt` | 160 | بطاقة المكان الزراعي مع شارات الإضاءة والرياح والحرارة وعدد النباتات |
-| `PlantGrowthGauge.kt` | 230 | مؤشر النمو الدائري، مسار المراحل الزمنية (Milestones)، وبطاقة ذاكرة الحديقة الذكية |
+| `PlantGrowthGauge.kt` | 230 | مؤشر النمو المحسوب، مسار المراحل الزمنية (Milestones)، وبطاقة ذاكرة الحديقة |
 | `AddPlantNicknameDialog.kt` | 205 | نافذة تحديد اسم الأصيص واختيار المكان أو إضافة مكان جديد وتأكيد الحفظ |
-| `PlantHeroCard.kt` | 198 | بطاقة الهيدر العلوية في شاشة التفاصيل (الاسم، المكان، دورة الري، الضوء) |
+| `PlantHeroCard.kt` | 198 | بطاقة الهيدر العلوية في شاشة التفاصيل (الاسم، المكان، الأصيص، دورة الري، الضوء) |
 | `UserPlantCard.kt` | 185 | بطاقة النبتة في الحديقة مع شارة المكان وتنبيه الري وزر السقاية السريعة |
 | `CareLogItemCard.kt` | 153 | عنصر بطاقة سجل العناية والتاريخ (ماء، سماد، صورة، ملاحظة) |
 | `CatalogPlantCard.kt` | 147 | بطاقة النبتة في كتالوج الإضافة مع دورة الري واحتياج الإضاءة |
@@ -41,15 +41,27 @@
 | File | Lines | Description & Responsibilities |
 |---|---|---|
 | `InitialPlantData.kt` | 134 | كتالوج البيانات الأولية (14 نبتة عربية/إنجليزية مع تردد الري والضوء) |
-| `GardenRepository.kt` | 135 | مستودع البيانات وربط الـ DAOs وعمليات الأماكن والري والرعاية |
-| `GardenDatabase.kt` | 118 | قاعدة بيانات Room المحلية مع Migration 1->2 للأماكن و Place entity |
-| `dao/PlaceDao.kt` | 33 | واجهة استعلامات وإدارة الأماكن (Places) |
+| `GardenRepository.kt` | 240 | مستودع البيانات وربط الـ DAOs وعمليات الحدائق، الأماكن، الأصص، التربة، النباتات والرعاية |
+| `GardenDatabase.kt` | 190 | قاعدة بيانات Room (نسخة 3) مع Migration 1->2 و Migration 2->3 و Converters |
+| `GardenConverters.kt` | 45 | محولات Room TypeConverters للـ Enums (ContainerType, GrowingMethod, DataSource) |
+| `dao/GardenDao.kt` | 35 | واجهة استعلامات وإدارة الحدائق (Gardens) |
+| `dao/PlaceDao.kt` | 38 | واجهة استعلامات وإدارة الأماكن (Places) مع دعم garden_id |
+| `dao/ContainerDao.kt` | 40 | واجهة استعلامات وإدارة الأصص والأوعية (Containers) |
+| `dao/SoilProfileDao.kt` | 35 | واجهة استعلامات وإدارة مواصفات التربة (SoilProfiles) |
+| `dao/SoilComponentDao.kt` | 30 | واجهة استعلامات وإدارة مكونات التربة (SoilComponents) |
 | `dao/PlantDao.kt` | 29 | واجهة استعلامات كتالوج النباتات العامة |
 | `dao/CareLogDao.kt` | 29 | واجهة استعلامات سجلات الرعاية |
-| `dao/UserPlantDao.kt` | 27 | واجهة استعلامات نباتات المستخدم وأصص الحديقة |
-| `model/Place.kt` | 13 | كيان جدول الأماكن (places) |
-| `model/UserPlant.kt` | 35 | كيان أصيص المستخدم في الحديقة مع المفتاح الأجنبي place_id |
-| `model/UserPlantWithDetails.kt` | 33 | فئة الدمج العلائقية لحساب أيام الري وموعد السقاية واسم المكان |
+| `dao/UserPlantDao.kt` | 32 | واجهة استعلامات نباتات المستخدم وأصص الحديقة |
+| `model/Garden.kt` | 15 | كيان الحديقة (gardens) |
+| `model/Place.kt` | 22 | كيان المكان (places) مع المفتاح الأجنبي garden_id |
+| `model/PlantContainer.kt` | 30 | كيان الأصيص/الوعاء (containers) مع نوع الوعاء وطريقة الزراعة |
+| `model/ContainerType.kt` | 12 | تعداد أنواع الأوعية (POT, PLANTER, GROW_BAG, BUCKET, TRAY, HYDROPONIC, OTHER) |
+| `model/GrowingMethod.kt` | 10 | تعداد طرق الزراعة (SOIL, HYDROPONIC, SEMI_HYDRO, SOILLESS, COCO, OTHER) |
+| `model/SoilProfile.kt` | 25 | كيان مواصفات التربة (soil_profiles) مع الرطوبة وpH والحرارة والمصدر |
+| `model/SoilComponent.kt` | 20 | كيان مكونات خلطة التربة (soil_components) |
+| `model/DataSource.kt` | 15 | بيانات المصدر الوصفية (USER_ENTERED, SENSOR, CALCULATED, ESTIMATED, PROTOTYPE) |
+| `model/UserPlant.kt` | 35 | كيان نبتة المستخدم مع المفتاح الأجنبي container_id |
+| `model/UserPlantWithDetails.kt` | 40 | فئة الدمج العلائقية لحساب الري، المكان، الأصيص ومواصفات التربة |
 | `model/CareLog.kt` | 28 | كيان سجل العناية (ماء، سماد، صورة، ملاحظة) |
 | `model/Plant.kt` | 17 | كيان النبتة العامة في الكتالوج |
 

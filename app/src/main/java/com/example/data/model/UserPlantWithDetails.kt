@@ -3,9 +3,11 @@ package com.example.data.model
 data class UserPlantWithDetails(
     val userPlant: UserPlant,
     val plant: Plant,
-    val place: Place?,
-    val lastWateredLog: CareLog?,
-    val latestCareLog: CareLog?
+    val container: PlantContainer? = null,
+    val place: Place? = null,
+    val soilProfile: SoilProfile? = null,
+    val lastWateredLog: CareLog? = null,
+    val latestCareLog: CareLog? = null
 ) {
     /**
      * Calculates whether the plant needs watering now based on water_frequency_days
@@ -26,4 +28,7 @@ data class UserPlantWithDetails(
 
     val placeName: String
         get() = place?.name ?: "البلكونة"
+
+    val containerName: String
+        get() = container?.name ?: "أصيص"
 }

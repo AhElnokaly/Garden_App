@@ -178,7 +178,7 @@ fun PlacesScreen(
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 items(places, key = { it.id }) { place ->
-                    val plantCount = allPlants.count { it.userPlant.place_id == place.id }
+                    val plantCount = allPlants.count { it.place?.id == place.id }
                     PlaceItemCard(
                         place = place,
                         plantCount = plantCount,

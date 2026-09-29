@@ -6,31 +6,28 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "user_plants",
+    tableName = "soil_profiles",
     foreignKeys = [
-        ForeignKey(
-            entity = Plant::class,
-            parentColumns = ["id"],
-            childColumns = ["plant_id"],
-            onDelete = ForeignKey.CASCADE
-        ),
         ForeignKey(
             entity = PlantContainer::class,
             parentColumns = ["id"],
             childColumns = ["container_id"],
-            onDelete = ForeignKey.RESTRICT
+            onDelete = ForeignKey.CASCADE
         )
     ],
     indices = [
-        Index("plant_id"),
         Index("container_id")
     ]
 )
-data class UserPlant(
+data class SoilProfile(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val plant_id: Int,
-    val nickname: String,
-    val container_id: Int = 1,
-    val added_date: Long = System.currentTimeMillis()
+    val container_id: Int,
+    val type: String? = null,
+    val moisture: Float? = null,
+    val pH: Float? = null,
+    val ec: Float? = null,
+    val soil_temperature: Float? = null,
+    val data_source: DataSource = DataSource.USER_ENTERED,
+    val last_updated: Long = System.currentTimeMillis()
 )
